@@ -22,6 +22,7 @@
   --sans: "Inter", -apple-system, system-ui, sans-serif;
   --tv-cover-width: 50vh;
   --tv-cover-height: 75vh;
+  --web-header-height: 130px; /* altura inicial; xs adapta en JS */
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
@@ -200,10 +201,10 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 /* ===== MODO WEB ===== */
 .web-mode { position: relative; z-index: 2; min-height: 100vh; display: none; }
 
-/* Cabeceira FIXA: ao facer scroll, queda pegada arriba */
+/* CABECEIRA FIXA usando position:fixed (máis fiable que sticky) */
 .web-header {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: 0; left: 0; right: 0;
   z-index: 30;
   background: var(--paper);
   border-bottom: 1px solid var(--rule);
@@ -212,13 +213,12 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   box-shadow: 0 2px 8px -4px rgba(0,0,0,0);
   transition: box-shadow 0.3s, padding 0.3s;
 }
-/* Cando se fai scroll, engadimos unha sombra sutil para separar visualmente */
 .web-header.is-scrolled {
-  padding: 16px 6vw 14px;
+  padding: 14px 6vw 12px;
   box-shadow: 0 4px 18px -8px rgba(0,0,0,0.18);
 }
-.web-header.is-scrolled .web-header-logo { height: 50px; }
-.web-header.is-scrolled .web-header-title { font-size: clamp(22px, 3.2vw, 36px); margin-bottom: 4px; }
+.web-header.is-scrolled .web-header-logo { height: 48px; }
+.web-header.is-scrolled .web-header-title { font-size: clamp(20px, 3vw, 30px); margin-bottom: 4px; }
 .web-header-logo { height: 70px; width: auto; flex-shrink: 0; transition: height 0.3s; }
 .web-header-text { flex: 1; min-width: 0; }
 .web-header-title {
@@ -243,7 +243,14 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 }
 .web-header-link:hover { color: var(--accent); border-color: var(--accent); }
 
-.web-grid { padding: 64px 6vw 96px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 56px 32px; }
+/* Padding-top dinámico calculado en JS para deixar espazo á cabeceira fixa */
+.web-grid {
+  padding: 64px 6vw 96px;
+  padding-top: calc(var(--web-header-height) + 40px);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 56px 32px;
+}
 .book-card { cursor: pointer; transition: transform 0.4s cubic-bezier(.4,0,.2,1); }
 .book-card:hover { transform: translateY(-6px); }
 .book-cover-wrap { aspect-ratio: 2/3; margin-bottom: 16px; box-shadow: 0 20px 30px -15px rgba(0,0,0,0.3), 0 6px 10px -6px rgba(0,0,0,0.15); border-radius: 2px; overflow: hidden; background: var(--ink); position: relative; transition: box-shadow 0.4s; }
@@ -313,12 +320,14 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   .tv-header-logo { height: 7vh; }
 }
 @media (max-width: 600px) {
-  .web-header { flex-direction: column; align-items: flex-start; padding: 16px 5vw 14px; gap: 12px; }
-  .web-header.is-scrolled { padding: 10px 5vw 8px; gap: 10px; }
+  .web-header { flex-direction: column; align-items: flex-start; padding: 14px 5vw 12px; gap: 10px; }
+  .web-header.is-scrolled { padding: 8px 5vw 6px; gap: 8px; }
   .web-header-logo { height: 50px; }
-  .web-header.is-scrolled .web-header-logo { height: 36px; }
-  .web-header-title { font-size: clamp(24px, 6vw, 36px); }
-  .web-header.is-scrolled .web-header-title { font-size: 18px; }
+  .web-header.is-scrolled .web-header-logo { height: 32px; }
+  .web-header-title { font-size: clamp(22px, 5.5vw, 32px); margin-bottom: 4px; }
+  .web-header.is-scrolled .web-header-title { font-size: 16px; margin-bottom: 2px; }
+  .web-header-subtitle { font-size: 11px; }
+  .web-header-link { font-size: 11px; }
   .modal-overlay { padding: 2vh 2vw; align-items: flex-start; }
   .modal-card { grid-template-columns: 1fr; max-height: none; overflow-y: visible; }
   .modal-cover { aspect-ratio: 16/9; max-height: 220px; }
@@ -326,7 +335,6 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   .modal-title { font-size: 28px; }
   .modal-author { font-size: 16px; margin-bottom: 18px; }
   .modal-synopsis { font-size: 16px; }
-  .web-header-link { font-size: 12px; }
 }
 </style>
 </head>
@@ -622,6 +630,8 @@ function hideStatus() {
 function render() {
   renderTvCarousel();
   renderWebGrid();
+  // Recalcular o tamaño da cabeceira fixa cando o contido cambia
+  if (document.body.classList.contains('is-web')) updateHeaderHeight();
 }
 
 function buildTvSlide(book, idx) {
@@ -794,19 +804,41 @@ function detectMode() {
 }
 
 /**
- * Engade unha sombra á cabeceira fixa cando se fai scroll.
- * Detecta scroll na xanela (modo standalone) e tamén dentro dun iframe.
+ * Mide a altura real da cabeceira fixa e actualiza a variable CSS
+ * para que o grid teña o padding-top correcto.
+ */
+function updateHeaderHeight() {
+  const header = document.getElementById('web-header');
+  if (!header) return;
+  const h = header.offsetHeight;
+  if (h > 0) {
+    document.documentElement.style.setProperty('--web-header-height', h + 'px');
+  }
+}
+
+/**
+ * Detecta scroll e engade/quita a clase is-scrolled á cabeceira.
+ * Funciona tanto se a páxina está soa como dentro dun iframe.
  */
 function setupStickyHeader() {
   const header = document.getElementById('web-header');
   if (!header) return;
   const handler = function() {
-    const scrolled = (window.scrollY || document.documentElement.scrollTop) > 8;
-    header.classList.toggle('is-scrolled', scrolled);
+    // Pillar o scroll de calquera fonte posible
+    const sy = window.pageYOffset
+      || document.documentElement.scrollTop
+      || document.body.scrollTop
+      || 0;
+    header.classList.toggle('is-scrolled', sy > 8);
+    // Recalcular altura cando cambia (porque colapsa)
+    requestAnimationFrame(updateHeaderHeight);
   };
   window.addEventListener('scroll', handler, { passive: true });
-  // Tamén en caso de scroll dentro do body (cando está dentro dun iframe en Drupal)
   document.addEventListener('scroll', handler, { passive: true });
+  window.addEventListener('resize', updateHeaderHeight, { passive: true });
+  // Medida inicial e cando cargue todo
+  updateHeaderHeight();
+  window.addEventListener('load', updateHeaderHeight);
 }
 
 function init() {
