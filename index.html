@@ -295,18 +295,60 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .book-title { font-family: var(--serif); font-weight: 400; font-size: 19px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 4px; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .book-author { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: 14px; color: var(--ink-soft); }
 
-.modal-overlay { position: fixed; inset: 0; background: rgba(20,18,15,0.7); backdrop-filter: blur(6px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 5vh 5vw; opacity: 0; transition: opacity 0.3s; }
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(20,18,15,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 5vh 5vw;
+  opacity: 0;
+  transition: opacity 0.3s;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .modal-overlay.open { display: flex; opacity: 1; }
-.modal-card { background: var(--paper); max-width: 880px; width: 100%; max-height: 90vh; overflow-y: auto; display: grid; grid-template-columns: 280px 1fr; gap: 0; border-radius: 4px; overflow: hidden; transform: translateY(20px) scale(0.98); transition: transform 0.4s cubic-bezier(.4,0,.2,1); position: relative; }
+.modal-card {
+  background: var(--paper);
+  max-width: 880px; width: 100%;
+  max-height: 90vh;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  border-radius: 4px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateY(20px) scale(0.98);
+  transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
 .modal-overlay.open .modal-card { transform: translateY(0) scale(1); }
 .modal-cover { background: var(--ink); aspect-ratio: 2/3; }
 .modal-cover img, .modal-cover .book-cover-fallback { width: 100%; height: 100%; object-fit: cover; }
 .modal-body { padding: 40px 36px; display: flex; flex-direction: column; }
-.modal-close { position: absolute; top: 16px; right: 16px; background: rgba(244,238,226,0.95); border: 0; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--ink); display: flex; align-items: center; justify-content: center; }
+.modal-close {
+  position: fixed;
+  top: 16px; right: 16px;
+  background: rgba(244,238,226,0.95);
+  border: 0;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 110;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
 .modal-eyebrow { font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 16px; }
 .modal-title { font-family: var(--serif); font-weight: 400; font-size: 36px; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 8px; }
 .modal-author { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--ink-soft); margin-bottom: 24px; }
-.modal-synopsis { font-family: var(--serif); font-weight: 300; font-size: 17px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 12px; flex: 1; }
+.modal-synopsis { font-family: var(--serif); font-weight: 300; font-size: 17px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 12px; }
 .synopsis-source { font-family: var(--sans); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 24px; display: flex; align-items: center; gap: 6px; }
 .synopsis-source .source-mark { color: var(--accent); font-size: 12px; }
 .modal-meta { border-top: 1px solid var(--rule); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 12px; }
@@ -323,8 +365,17 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 }
 @media (max-width: 600px) {
   .web-header { flex-direction: column; align-items: flex-start; }
-  .modal-card { grid-template-columns: 1fr; max-height: 95vh; }
-  .modal-cover { aspect-ratio: 16/9; }
+  .modal-overlay { padding: 2vh 2vw; align-items: flex-start; }
+  .modal-card {
+    grid-template-columns: 1fr;
+    max-height: none;
+    overflow-y: visible;
+  }
+  .modal-cover { aspect-ratio: 16/9; max-height: 220px; }
+  .modal-body { padding: 28px 22px 36px; }
+  .modal-title { font-size: 28px; }
+  .modal-author { font-size: 16px; margin-bottom: 18px; }
+  .modal-synopsis { font-size: 16px; }
   .web-header-link { font-size: 12px; }
 }
 </style>
@@ -368,15 +419,15 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   </main>
 
   <div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal-card" id="modal-card"></div>
     <button class="modal-close" id="modal-close" aria-label="Pechar">✕</button>
+    <div class="modal-card" id="modal-card"></div>
   </div>
 
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbyp7dbytwIniQpQX7mqEZymI6I8DV1JfW0EJxAeupOmIskw5vqRg-u8lRxoH-fmY1fI/exec';
 const TV_DURATION_MS = 9000;
 const REFRESH_MINUTES = 30;
-const TV_MIN_WIDTH = 1280; // ancho mínimo para activar modo TV automaticamente
+const TV_MIN_WIDTH = 1280;
 
 let books = [];
 let tvIdx = 0;
@@ -665,20 +716,18 @@ function openModal(book) {
   card.appendChild(coverDiv);
   card.appendChild(body);
   modal.classList.add('open');
+  // Reset scroll position when opening
+  modal.scrollTop = 0;
+  card.scrollTop = 0;
 }
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
 }
 
-/**
- * Detección automática de modo: TV se a pantalla é grande (≥1280px de ancho),
- * web se é máis pequena. Pode forzarse con ?modo=tv ou ?modo=web.
- */
 function detectMode() {
   const params = new URLSearchParams(window.location.search);
   const forced = params.get('modo');
   if (forced === 'tv' || forced === 'web') return forced;
-  // Detección automática por ancho de pantalla
   return window.innerWidth >= TV_MIN_WIDTH ? 'tv' : 'web';
 }
 
