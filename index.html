@@ -64,7 +64,6 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .tv-mode { position: relative; z-index: 2; width: 100vw; height: 100vh; overflow: hidden; display: none; }
 .tv-stage { position: absolute; inset: 0; }
 
-/* Cabeceira da TV */
 .tv-header {
   position: absolute;
   top: 0; left: 0; right: 0;
@@ -123,7 +122,6 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 }
 .tv-slide.active .tv-blur-bg { opacity: 1; }
 
-/* Portada en posición absoluta - SEMPRE mesmo tamaño */
 .tv-cover-wrap {
   position: absolute;
   left: 7vw;
@@ -189,7 +187,6 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 }
 .tv-synopsis .auto-mark { display: inline-block; font-size: 0.65em; color: var(--accent-soft); vertical-align: super; margin-left: 4px; opacity: 0.7; }
 
-/* Pé inferior - sen logo nin texto, só puntos de progreso e info á dereita */
 .tv-footer {
   position: absolute; bottom: 3vh; left: 7vw; right: 7vw;
   display: flex; align-items: center; justify-content: space-between;
@@ -201,7 +198,6 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .tv-progress-dot { width: 24px; height: 2px; background: rgba(244,238,226,0.2); transition: background 0.4s; }
 .tv-progress-dot.active { background: var(--accent-soft); }
 
-/* Botóns de navegación */
 .tv-nav {
   position: absolute;
   top: 50%;
@@ -244,7 +240,7 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   width: auto;
   flex-shrink: 0;
 }
-.web-header-text { flex: 1; }
+.web-header-text { flex: 1; min-width: 0; }
 .web-header-title {
   font-family: var(--serif);
   font-weight: 500;
@@ -253,7 +249,13 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   letter-spacing: 0.01em;
   text-transform: uppercase;
   color: var(--ink);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+}
+.web-header-subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
 }
 .web-header-subtitle {
   font-family: var(--sans);
@@ -263,13 +265,21 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   text-transform: uppercase;
   color: var(--accent);
 }
-.web-header-meta {
-  text-align: right;
-  font-size: 13px; color: var(--ink-mute);
-  font-weight: 400; line-height: 1.5;
-  flex-shrink: 0;
+.web-header-link {
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
 }
-.web-header-meta strong { display: block; font-family: var(--serif); font-size: 32px; font-weight: 400; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+.web-header-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
 .web-grid { padding: 64px 6vw 96px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 56px 32px; }
 .book-card { cursor: pointer; transition: transform 0.4s cubic-bezier(.4,0,.2,1); }
 .book-card:hover { transform: translateY(-6px); }
@@ -313,13 +323,13 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 }
 @media (max-width: 600px) {
   .web-header { flex-direction: column; align-items: flex-start; }
-  .web-header-meta { text-align: left; }
   .modal-card { grid-template-columns: 1fr; max-height: 95vh; }
   .modal-cover { aspect-ratio: 16/9; }
+  .web-header-link { font-size: 12px; }
 }
 </style>
 </head>
-<body class="is-tv">
+<body>
 
   <div class="status-screen" id="status-screen">
     <div class="status-mark">B</div>
@@ -348,11 +358,10 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
       <img class="web-header-logo" src="Logo_Belesar2024.png" alt="CEIP Belesar" onerror="this.style.display='none'">
       <div class="web-header-text">
         <div class="web-header-title">Novas adquisicións</div>
-        <div class="web-header-subtitle">Biblioteca do CEIP de Belesar</div>
-      </div>
-      <div class="web-header-meta">
-        <strong id="web-count">0</strong>
-        libros novos
+        <div class="web-header-subtitle-row">
+          <span class="web-header-subtitle">Biblioteca do CEIP de Belesar</span>
+          <a class="web-header-link" href="https://ceipbelesar.edubib.xunta.gal/" target="_blank" rel="noopener">Ver catálogo completo →</a>
+        </div>
       </div>
     </header>
     <section class="web-grid" id="web-grid"></section>
@@ -367,6 +376,7 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 const API_URL = 'https://script.google.com/macros/s/AKfycbyp7dbytwIniQpQX7mqEZymI6I8DV1JfW0EJxAeupOmIskw5vqRg-u8lRxoH-fmY1fI/exec';
 const TV_DURATION_MS = 9000;
 const REFRESH_MINUTES = 30;
+const TV_MIN_WIDTH = 1280; // ancho mínimo para activar modo TV automaticamente
 
 let books = [];
 let tvIdx = 0;
@@ -594,7 +604,6 @@ function tvNext() {
 function renderWebGrid() {
   const grid = document.getElementById('web-grid');
   grid.innerHTML = '';
-  document.getElementById('web-count').textContent = books.length;
 
   books.forEach((book, idx) => {
     const card = document.createElement('article');
@@ -661,9 +670,20 @@ function closeModal() {
   document.getElementById('modal').classList.remove('open');
 }
 
-function init() {
+/**
+ * Detección automática de modo: TV se a pantalla é grande (≥1280px de ancho),
+ * web se é máis pequena. Pode forzarse con ?modo=tv ou ?modo=web.
+ */
+function detectMode() {
   const params = new URLSearchParams(window.location.search);
-  const mode = params.get('modo') === 'web' ? 'web' : 'tv';
+  const forced = params.get('modo');
+  if (forced === 'tv' || forced === 'web') return forced;
+  // Detección automática por ancho de pantalla
+  return window.innerWidth >= TV_MIN_WIDTH ? 'tv' : 'web';
+}
+
+function init() {
+  const mode = detectMode();
   document.body.classList.toggle('is-tv', mode === 'tv');
   document.body.classList.toggle('is-web', mode === 'web');
 
