@@ -75,33 +75,19 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   background: linear-gradient(to bottom, rgba(13,12,10,0.85), rgba(13,12,10,0));
   pointer-events: none;
 }
-.tv-header-logo {
-  height: 9vh;
-  width: auto;
-  flex-shrink: 0;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
-}
-.tv-header-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+.tv-header-logo { height: 9vh; width: auto; flex-shrink: 0; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); }
+.tv-header-text { display: flex; flex-direction: column; justify-content: center; }
 .tv-header-title {
-  font-family: var(--serif);
-  font-weight: 500;
+  font-family: var(--serif); font-weight: 500;
   font-size: clamp(28px, 4.4vh, 56px);
-  line-height: 1;
-  letter-spacing: 0.02em;
-  color: #f4eee2;
-  text-transform: uppercase;
+  line-height: 1; letter-spacing: 0.02em;
+  color: #f4eee2; text-transform: uppercase;
   margin-bottom: 0.4vh;
 }
 .tv-header-subtitle {
-  font-family: var(--sans);
-  font-weight: 500;
+  font-family: var(--sans); font-weight: 500;
   font-size: clamp(11px, 1.6vh, 18px);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
+  letter-spacing: 0.3em; text-transform: uppercase;
   color: var(--accent-soft);
 }
 
@@ -124,28 +110,22 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 
 .tv-cover-wrap {
   position: absolute;
-  left: 7vw;
-  top: 50%;
+  left: 7vw; top: 50%;
   transform: translateY(-45%);
   width: var(--tv-cover-width);
   height: var(--tv-cover-height);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
 }
 .tv-cover, .tv-cover-fallback {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   object-fit: cover;
   box-shadow: var(--shadow-book), 0 0 0 1px rgba(255,255,255,0.05);
   border-radius: 4px;
   transform: rotate(-1.5deg);
 }
 .tv-cover-fallback {
-  display: flex; flex-direction: column;
-  justify-content: space-between;
-  padding: 2.5vh 2vh;
-  color: #f4eee2;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 2.5vh 2vh; color: #f4eee2;
 }
 .tv-cover-fallback .fb-marker { width: 30px; height: 4px; background: currentColor; }
 .tv-cover-fallback .fb-title { font-family: var(--serif); font-weight: 500; font-size: clamp(18px, 2.6vh, 32px); line-height: 1.1; letter-spacing: -0.01em; }
@@ -154,8 +134,7 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .tv-text {
   position: absolute;
   left: calc(7vw + var(--tv-cover-width) + 5vw);
-  right: 7vw;
-  top: 50%;
+  right: 7vw; top: 50%;
   transform: translateY(-45%);
   max-width: 50vw;
 }
@@ -199,17 +178,13 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .tv-progress-dot.active { background: var(--accent-soft); }
 
 .tv-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 20;
-  width: 56px; height: 56px;
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 20; width: 56px; height: 56px;
   border-radius: 50%;
   border: 1px solid rgba(244, 238, 226, 0.2);
   background: rgba(13, 12, 10, 0.5);
   color: rgba(244, 238, 226, 0.7);
-  font-family: var(--serif);
-  font-size: 36px; line-height: 1;
+  font-family: var(--serif); font-size: 36px; line-height: 1;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   padding: 0; padding-bottom: 4px;
@@ -218,11 +193,7 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   backdrop-filter: blur(6px);
 }
 .tv-mode:hover .tv-nav { opacity: 1; }
-.tv-nav:hover, .tv-nav:focus {
-  background: rgba(13, 12, 10, 0.85);
-  color: var(--accent-soft); border-color: var(--accent-soft);
-  outline: none; opacity: 1;
-}
+.tv-nav:hover, .tv-nav:focus { background: rgba(13, 12, 10, 0.85); color: var(--accent-soft); border-color: var(--accent-soft); outline: none; opacity: 1; }
 .tv-nav-prev { left: 1.5vw; }
 .tv-nav-next { right: 1.5vw; }
 
@@ -231,55 +202,31 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .web-header {
   border-bottom: 1px solid var(--rule);
   padding: 32px 6vw 28px;
-  display: flex;
-  align-items: center;
-  gap: 28px;
+  display: flex; align-items: center; gap: 28px;
 }
-.web-header-logo {
-  height: 70px;
-  width: auto;
-  flex-shrink: 0;
-}
+.web-header-logo { height: 70px; width: auto; flex-shrink: 0; }
 .web-header-text { flex: 1; min-width: 0; }
 .web-header-title {
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: clamp(32px, 5vw, 64px);
-  line-height: 1;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-  color: var(--ink);
-  margin-bottom: 8px;
+  font-family: var(--serif); font-weight: 500;
+  font-size: clamp(32px, 5vw, 64px); line-height: 1;
+  letter-spacing: 0.01em; text-transform: uppercase;
+  color: var(--ink); margin-bottom: 8px;
 }
-.web-header-subtitle-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
+.web-header-subtitle-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
 .web-header-subtitle {
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
+  font-family: var(--sans); font-weight: 500;
+  font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase;
   color: var(--accent);
 }
 .web-header-link {
-  font-family: var(--sans);
-  font-weight: 400;
-  font-size: 13px;
-  letter-spacing: 0.05em;
-  color: var(--ink-soft);
-  text-decoration: none;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 2px;
+  font-family: var(--sans); font-weight: 400;
+  font-size: 13px; letter-spacing: 0.05em;
+  color: var(--ink-soft); text-decoration: none;
+  border-bottom: 1px solid var(--rule); padding-bottom: 2px;
   transition: color 0.2s, border-color 0.2s;
 }
-.web-header-link:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
+.web-header-link:hover { color: var(--accent); border-color: var(--accent); }
+
 .web-grid { padding: 64px 6vw 96px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 56px 32px; }
 .book-card { cursor: pointer; transition: transform 0.4s cubic-bezier(.4,0,.2,1); }
 .book-card:hover { transform: translateY(-6px); }
@@ -295,32 +242,24 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .book-title { font-family: var(--serif); font-weight: 400; font-size: 19px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 4px; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .book-author { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: 14px; color: var(--ink-soft); }
 
-/* ===== MODAL ===== */
 .modal-overlay {
   position: fixed; inset: 0;
   background: rgba(20,18,15,0.7);
   backdrop-filter: blur(6px);
-  z-index: 100;
-  display: none;
-  align-items: center;
-  justify-content: center;
+  z-index: 100; display: none;
+  align-items: center; justify-content: center;
   padding: 5vh 5vw;
-  opacity: 0;
-  transition: opacity 0.3s;
+  opacity: 0; transition: opacity 0.3s;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 .modal-overlay.open { display: flex; opacity: 1; }
 .modal-card {
   background: var(--paper);
-  max-width: 880px; width: 100%;
-  max-height: 90vh;
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 0;
+  max-width: 880px; width: 100%; max-height: 90vh;
+  display: grid; grid-template-columns: 280px 1fr; gap: 0;
   border-radius: 4px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
   transform: translateY(20px) scale(0.98);
   transition: transform 0.4s cubic-bezier(.4,0,.2,1);
   position: relative;
@@ -330,18 +269,12 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .modal-cover img, .modal-cover .book-cover-fallback { width: 100%; height: 100%; object-fit: cover; }
 .modal-body { padding: 40px 36px; display: flex; flex-direction: column; }
 .modal-close {
-  position: fixed;
-  top: 16px; right: 16px;
+  position: fixed; top: 16px; right: 16px;
   background: rgba(244,238,226,0.95);
-  border: 0;
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 18px;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 0; width: 36px; height: 36px;
+  border-radius: 50%; cursor: pointer;
+  font-size: 18px; color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
   z-index: 110;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
@@ -366,11 +299,7 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 @media (max-width: 600px) {
   .web-header { flex-direction: column; align-items: flex-start; }
   .modal-overlay { padding: 2vh 2vw; align-items: flex-start; }
-  .modal-card {
-    grid-template-columns: 1fr;
-    max-height: none;
-    overflow-y: visible;
-  }
+  .modal-card { grid-template-columns: 1fr; max-height: none; overflow-y: visible; }
   .modal-cover { aspect-ratio: 16/9; max-height: 220px; }
   .modal-body { padding: 28px 22px 36px; }
   .modal-title { font-size: 28px; }
@@ -444,6 +373,155 @@ const COVER_PALETTES = [
 function paletteForBook(book) {
   const seed = (book.isbn || book.titulo || '').split('').reduce((a,c) => a + c.charCodeAt(0), 0);
   return COVER_PALETTES[seed % COVER_PALETTES.length];
+}
+
+/**
+ * Mapa completo de signaturas CDU a categorías curtas en galego.
+ * Regras de detección (de máis específico a máis xeral):
+ *   1. Subdivisións especiais como 82C/82E/82N/82P/82T (literatura).
+ *   2. Códigos de 3 cifras (159.9, 796, 811...).
+ *   3. Códigos de 2 cifras (33, 59, 82, 93...).
+ *   4. Clases principais de 1 cifra (3, 5, 7, 9...).
+ *   5. Se non encaixa, devolve null e a etiqueta queda "NOVA ADQUISICIÓN".
+ */
+function categoryFromSignatura(signatura) {
+  if (!signatura) return null;
+  const sig = String(signatura).trim().toUpperCase();
+  if (!sig) return null;
+
+  // 1. Literatura (CDU 82) — verificar primeiro porque o noso colexio usa subdivisións
+  // Formato: 82C-G, 82C-N, 82N-G, 82P-I, etc. O sufixo de idioma ignórase.
+  const lit = sig.match(/^82([CENPT])/);
+  if (lit) {
+    switch (lit[1]) {
+      case 'C': return 'CÓMIC';
+      case 'E': return 'ENSAIO';
+      case 'N': return 'NARRATIVA';
+      case 'P': return 'POESÍA';
+      case 'T': return 'TEATRO';
+    }
+  }
+
+  // Extraer só os primeiros caracteres numéricos da signatura
+  // Ex: "82P-G BRA don" → "82P-G", "59 LAU veñ" → "59", "159.9 X" → "159.9"
+  const codeMatch = sig.match(/^([0-9]+(?:\.[0-9]+)?)/);
+  if (!codeMatch) return null;
+  const code = codeMatch[1];
+
+  // 2. Códigos de 3 ou máis cifras / decimais
+  if (code === '159.9') return 'PSICOLOXÍA';
+  if (code === '796') return 'DEPORTES';
+  if (code === '811') return 'IDIOMAS';
+  if (code === '004') return 'INFORMÁTICA';
+  if (code === '070') return 'XORNALISMO';
+
+  // 3. Códigos de 2 cifras
+  const code2 = code.substring(0, 2);
+  switch (code2) {
+    // CDU 0 — Xeneralidades
+    case '00': return 'XENERALIDADES';
+    case '02': return 'BIBLIOTECONOMÍA';
+    case '03': return 'ENCICLOPEDIAS';
+    // CDU 1 — Filosofía / Psicoloxía
+    case '14': return 'FILOSOFÍA';
+    case '15': return 'PSICOLOXÍA';
+    case '17': return 'ÉTICA';
+    // CDU 2 — Relixión
+    case '22': return 'BIBLIA';
+    case '24': return 'RELIXIÓN';
+    case '25': return 'RELIXIÓN';
+    case '26': return 'RELIXIÓN';
+    case '27': return 'RELIXIÓN';
+    case '28': return 'RELIXIÓN';
+    case '29': return 'MITOLOXÍA';
+    // CDU 3 — Ciencias sociais
+    case '30': return 'SOCIOLOXÍA';
+    case '31': return 'ESTATÍSTICA';
+    case '32': return 'POLÍTICA';
+    case '33': return 'ECONOMÍA';
+    case '34': return 'DEREITO';
+    case '35': return 'ADMINISTRACIÓN';
+    case '36': return 'BENESTAR SOCIAL';
+    case '37': return 'EDUCACIÓN';
+    case '39': return 'ETNOGRAFÍA';
+    // CDU 5 — Ciencias puras
+    case '50': return 'MEDIO AMBIENTE';
+    case '51': return 'MATEMÁTICAS';
+    case '52': return 'ASTRONOMÍA';
+    case '53': return 'FÍSICA';
+    case '54': return 'QUÍMICA';
+    case '55': return 'XEOLOXÍA';
+    case '56': return 'PALEONTOLOXÍA';
+    case '57': return 'BIOLOXÍA';
+    case '58': return 'BOTÁNICA';
+    case '59': return 'ZOOLOXÍA';
+    // CDU 6 — Ciencias aplicadas
+    case '61': return 'MEDICINA';
+    case '62': return 'ENXEÑARÍA';
+    case '63': return 'AGRICULTURA';
+    case '64': return 'COCIÑA E FOGAR';
+    case '65': return 'COMUNICACIÓN';
+    case '66': return 'INDUSTRIA';
+    case '67': return 'INDUSTRIA';
+    case '68': return 'OFICIOS';
+    case '69': return 'CONSTRUCIÓN';
+    // CDU 7 — Arte / Lecer / Deportes
+    case '72': return 'ARQUITECTURA';
+    case '73': return 'ESCULTURA';
+    case '74': return 'MANUALIDADES';
+    case '75': return 'PINTURA';
+    case '76': return 'GRAVADO';
+    case '77': return 'FOTOGRAFÍA';
+    case '78': return 'MÚSICA';
+    case '79': return 'LECER';
+    // CDU 8 — Lingua e literatura (xenérico, se non encaixou en 82C/82N/etc)
+    case '80': return 'LINGUAXE';
+    case '81': return 'LINGUAXE';
+    case '82': return 'LITERATURA';
+    // CDU 9 — Xeografía e historia
+    case '91': return 'XEOGRAFÍA';
+    case '92': return 'BIOGRAFÍA';
+    case '93': return 'HISTORIA';
+    case '94': return 'HISTORIA';
+    case '95': return 'HISTORIA';
+    case '96': return 'HISTORIA';
+    case '97': return 'HISTORIA';
+    case '98': return 'HISTORIA';
+    case '99': return 'HISTORIA';
+  }
+
+  // 4. Clases principais de 1 cifra
+  switch (code.charAt(0)) {
+    case '0': return 'XENERALIDADES';
+    case '1': return 'FILOSOFÍA';
+    case '2': return 'RELIXIÓN';
+    case '3': return 'SOCIEDADE';
+    case '4': return null; // CDU 4 está sen uso oficial
+    case '5': return 'CIENCIA';
+    case '6': return 'TECNOLOXÍA';
+    case '7': return 'ARTE';
+    case '8': return 'LITERATURA';
+    case '9': return 'HISTORIA';
+  }
+  return null;
+}
+
+/**
+ * Constrúe a etiqueta "eyebrow" segundo se é destacado ou non,
+ * e se ten categoría detectable a partir da signatura.
+ */
+function buildEyebrowText(book, isModal) {
+  if (book.destacado) {
+    return isModal ? '★ Recomendación destacada' : 'Recomendación destacada';
+  }
+  const cat = categoryFromSignatura(book.signatura);
+  return cat ? 'Nova adquisición — ' + cat : 'Nova adquisición';
+}
+function buildEyebrowTextShort(book) {
+  // Versión para a tarxeta da galería web (máis curta visualmente)
+  if (book.destacado) return 'Destacado';
+  const cat = categoryFromSignatura(book.signatura);
+  return cat ? 'Nova adquisición · ' + cat : 'Nova adquisición';
 }
 
 function cleanTitle(titulo) {
@@ -596,7 +674,7 @@ function buildTvSlide(book, idx) {
 
   const cleanedTitle = cleanTitle(book.titulo);
   text.innerHTML = `
-    <div class="tv-eyebrow">${book.destacado ? 'Recomendación destacada' : 'Nova adquisición'}</div>
+    <div class="tv-eyebrow">${escapeHtml(buildEyebrowText(book, false))}</div>
     <h2 class="tv-title">${escapeHtml(cleanedTitle)}</h2>
     <div class="tv-author">${escapeHtml(book.autor || '')}</div>
     ${synopsisHtml}
@@ -640,7 +718,6 @@ function startTvTimer() {
   if (books.length <= 1) return;
   tvTimer = setInterval(() => { showTvSlide((tvIdx + 1) % books.length); }, TV_DURATION_MS);
 }
-
 function tvPrev() {
   if (books.length <= 1) return;
   showTvSlide((tvIdx - 1 + books.length) % books.length);
@@ -668,7 +745,7 @@ function renderWebGrid() {
     const meta = document.createElement('div');
     meta.innerHTML = `
       <div class="book-meta-rule"></div>
-      <div class="book-eyebrow">${book.destacado ? 'Destacado' : 'Nova adquisición'}</div>
+      <div class="book-eyebrow">${escapeHtml(buildEyebrowTextShort(book))}</div>
       <h3 class="book-title">${escapeHtml(cleanTitle(book.titulo))}</h3>
       <div class="book-author">${escapeHtml(book.autor || '')}</div>
     `;
@@ -701,7 +778,7 @@ function openModal(book) {
     : '';
 
   body.innerHTML = `
-    <div class="modal-eyebrow">${book.destacado ? '★ Recomendación destacada' : 'Nova adquisición'}</div>
+    <div class="modal-eyebrow">${escapeHtml(buildEyebrowText(book, true))}</div>
     <h2 class="modal-title" id="modal-title">${escapeHtml(cleanTitle(book.titulo))}</h2>
     <div class="modal-author">${escapeHtml(book.autor || '')}</div>
     <p class="modal-synopsis">${escapeHtml(book.sinopsis || 'Sen sinopse dispoñible.')}</p>
@@ -716,7 +793,6 @@ function openModal(book) {
   card.appendChild(coverDiv);
   card.appendChild(body);
   modal.classList.add('open');
-  // Reset scroll position when opening
   modal.scrollTop = 0;
   card.scrollTop = 0;
 }
