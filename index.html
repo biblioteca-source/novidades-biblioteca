@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="gl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novidades — Biblioteca CEIP Belesar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f4eee2;
+  --paper-soft: #ebe3d2;
+  --ink: #1a1a1a;
+  --ink-soft: #4a4642;
+  --ink-mute: #807a72;
+  --accent: #b3402c;
+  --accent-soft: #d4a05a;
+  --rule: rgba(26,26,26,0.12);
+  --shadow-book: 0 30px 60px -20px rgba(26,26,26,0.45), 0 10px 25px -10px rgba(26,26,26,0.25);
+  --serif: "Fraunces", "Cormorant Garamond", Georgia, serif;
+  --sans: "Inter", -apple-system, system-ui, sans-serif;
+  --tv-cover-width: 50vh;
+  --tv-cover-height: 75vh;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.05 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 1; opacity: 0.6;
+}
+body.is-tv { background: #0d0c0a; }
+body.is-tv::before { opacity: 0.2; }
+body.is-tv .web-mode { display: none; }
+body.is-tv .tv-mode { display: block; }
+body.is-web .tv-mode { display: none; }
+body.is-web .web-mode { display: block; }
+
+.status-screen {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: var(--paper);
+  font-family: var(--serif);
+  text-align: center;
+  padding: 20px;
+}
+body.is-tv .status-screen { background: #0d0c0a; color: #f4eee2; }
+.status-mark { font-style: italic; font-size: 64px; color: var(--accent); margin-bottom: 24px; animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+.status-title { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
+.status-detail { font-family: var(--sans); font-size: 13px; color: var(--ink-mute); max-width: 400px; line-height: 1.5; }
+body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
+.status-screen.hidden { display: none; }
+
+.tv-mode { position: relative; z-index: 2; width: 100vw; height: 100vh; overflow: hidden; display: none; }
+.tv-stage { position: absolute; inset: 0; }
+
+/* Cabeceira da TV */
+.tv-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 15;
+  padding: 3vh 4vw 2.5vh;
+  display: flex;
+  align-items: center;
+  gap: 3vw;
+  background: linear-gradient(to bottom, rgba(13,12,10,0.85), rgba(13,12,10,0));
+  pointer-events: none;
+}
+.tv-header-logo {
+  height: 9vh;
+  width: auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+}
+.tv-header-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.tv-header-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(28px, 4.4vh, 56px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: #f4eee2;
+  text-transform: uppercase;
+  margin-bottom: 0.4vh;
+}
+.tv-header-subtitle {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(11px, 1.6vh, 18px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+
+.tv-slide {
+  position: absolute; inset: 0;
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 1.2s cubic-bezier(.4,0,.2,1), transform 1.2s cubic-bezier(.4,0,.2,1);
+  color: #f4eee2;
+}
+.tv-slide.active { opacity: 1; transform: translateY(0); }
+
+.tv-blur-bg {
+  position: absolute; inset: -10%;
+  background-size: cover; background-position: center;
+  filter: blur(60px) saturate(1.4) brightness(0.4);
+  transform: scale(1.2); opacity: 0;
+  transition: opacity 1.5s ease; z-index: -1;
+}
+.tv-slide.active .tv-blur-bg { opacity: 1; }
+
+/* Portada en posición absoluta - SEMPRE mesmo tamaño */
+.tv-cover-wrap {
+  position: absolute;
+  left: 7vw;
+  top: 50%;
+  transform: translateY(-45%);
+  width: var(--tv-cover-width);
+  height: var(--tv-cover-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tv-cover, .tv-cover-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-shadow: var(--shadow-book), 0 0 0 1px rgba(255,255,255,0.05);
+  border-radius: 4px;
+  transform: rotate(-1.5deg);
+}
+.tv-cover-fallback {
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5vh 2vh;
+  color: #f4eee2;
+}
+.tv-cover-fallback .fb-marker { width: 30px; height: 4px; background: currentColor; }
+.tv-cover-fallback .fb-title { font-family: var(--serif); font-weight: 500; font-size: clamp(18px, 2.6vh, 32px); line-height: 1.1; letter-spacing: -0.01em; }
+.tv-cover-fallback .fb-author { font-family: var(--serif); font-style: italic; font-size: clamp(11px, 1.5vh, 16px); opacity: 0.85; }
+
+.tv-text {
+  position: absolute;
+  left: calc(7vw + var(--tv-cover-width) + 5vw);
+  right: 7vw;
+  top: 50%;
+  transform: translateY(-45%);
+  max-width: 50vw;
+}
+.tv-eyebrow {
+  font-family: var(--sans); font-size: clamp(10px, 1.2vh, 14px);
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--accent-soft); margin-bottom: 3vh; font-weight: 500;
+}
+.tv-eyebrow::before { content: ""; display: inline-block; width: 30px; height: 1px; background: var(--accent-soft); vertical-align: middle; margin-right: 12px; }
+.tv-title {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(32px, 5.5vh, 72px); line-height: 1.05;
+  letter-spacing: -0.02em; color: #f4eee2; margin-bottom: 2.5vh;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.tv-author {
+  font-family: var(--serif); font-style: italic; font-weight: 300;
+  font-size: clamp(16px, 2.2vh, 28px); color: var(--accent-soft); margin-bottom: 4vh;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tv-author::before { content: "por "; font-style: normal; color: rgba(244,238,226,0.5); font-size: 0.7em; letter-spacing: 0.1em; text-transform: uppercase; vertical-align: middle; margin-right: 6px; }
+.tv-author:empty::before { content: ""; }
+.tv-synopsis {
+  font-family: var(--serif); font-weight: 300;
+  font-size: clamp(13px, 1.8vh, 20px); line-height: 1.5;
+  color: rgba(244,238,226,0.85); max-width: 30em; position: relative;
+  display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tv-synopsis .auto-mark { display: inline-block; font-size: 0.65em; color: var(--accent-soft); vertical-align: super; margin-left: 4px; opacity: 0.7; }
+
+/* Pé inferior - sen logo nin texto, só puntos de progreso e info á dereita */
+.tv-footer {
+  position: absolute; bottom: 3vh; left: 7vw; right: 7vw;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 10; color: rgba(244,238,226,0.6);
+  font-size: clamp(10px, 1.2vh, 14px); letter-spacing: 0.15em;
+  text-transform: uppercase; font-weight: 500;
+}
+.tv-progress { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; justify-content: flex-start; max-width: 60%; }
+.tv-progress-dot { width: 24px; height: 2px; background: rgba(244,238,226,0.2); transition: background 0.4s; }
+.tv-progress-dot.active { background: var(--accent-soft); }
+
+/* Botóns de navegación */
+.tv-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: 1px solid rgba(244, 238, 226, 0.2);
+  background: rgba(13, 12, 10, 0.5);
+  color: rgba(244, 238, 226, 0.7);
+  font-family: var(--serif);
+  font-size: 36px; line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; padding-bottom: 4px;
+  opacity: 0;
+  transition: opacity 0.3s, background 0.2s, color 0.2s, border-color 0.2s;
+  backdrop-filter: blur(6px);
+}
+.tv-mode:hover .tv-nav { opacity: 1; }
+.tv-nav:hover, .tv-nav:focus {
+  background: rgba(13, 12, 10, 0.85);
+  color: var(--accent-soft); border-color: var(--accent-soft);
+  outline: none; opacity: 1;
+}
+.tv-nav-prev { left: 1.5vw; }
+.tv-nav-next { right: 1.5vw; }
+
+/* ===== MODO WEB ===== */
+.web-mode { position: relative; z-index: 2; min-height: 100vh; display: none; }
+.web-header {
+  border-bottom: 1px solid var(--rule);
+  padding: 32px 6vw 28px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.web-header-logo {
+  height: 70px;
+  width: auto;
+  flex-shrink: 0;
+}
+.web-header-text { flex: 1; }
+.web-header-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(32px, 5vw, 64px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.web-header-subtitle {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.web-header-meta {
+  text-align: right;
+  font-size: 13px; color: var(--ink-mute);
+  font-weight: 400; line-height: 1.5;
+  flex-shrink: 0;
+}
+.web-header-meta strong { display: block; font-family: var(--serif); font-size: 32px; font-weight: 400; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+.web-grid { padding: 64px 6vw 96px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 56px 32px; }
+.book-card { cursor: pointer; transition: transform 0.4s cubic-bezier(.4,0,.2,1); }
+.book-card:hover { transform: translateY(-6px); }
+.book-cover-wrap { aspect-ratio: 2/3; margin-bottom: 16px; box-shadow: 0 20px 30px -15px rgba(0,0,0,0.3), 0 6px 10px -6px rgba(0,0,0,0.15); border-radius: 2px; overflow: hidden; background: var(--ink); position: relative; transition: box-shadow 0.4s; }
+.book-card:hover .book-cover-wrap { box-shadow: 0 30px 40px -15px rgba(0,0,0,0.4), 0 10px 15px -6px rgba(0,0,0,0.2); }
+.book-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+.book-cover-fallback { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 18px 14px; color: var(--paper); font-family: var(--serif); }
+.book-cover-fallback .fb-marker { width: 24px; height: 3px; background: currentColor; opacity: 0.8; }
+.book-cover-fallback .fb-title { font-size: 18px; line-height: 1.05; letter-spacing: -0.01em; }
+.book-cover-fallback .fb-author { font-size: 12px; font-style: italic; opacity: 0.85; }
+.book-meta-rule { width: 28px; height: 1px; background: var(--accent); margin-bottom: 10px; }
+.book-eyebrow { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 6px; font-weight: 500; }
+.book-title { font-family: var(--serif); font-weight: 400; font-size: 19px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 4px; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.book-author { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: 14px; color: var(--ink-soft); }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(20,18,15,0.7); backdrop-filter: blur(6px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 5vh 5vw; opacity: 0; transition: opacity 0.3s; }
+.modal-overlay.open { display: flex; opacity: 1; }
+.modal-card { background: var(--paper); max-width: 880px; width: 100%; max-height: 90vh; overflow-y: auto; display: grid; grid-template-columns: 280px 1fr; gap: 0; border-radius: 4px; overflow: hidden; transform: translateY(20px) scale(0.98); transition: transform 0.4s cubic-bezier(.4,0,.2,1); position: relative; }
+.modal-overlay.open .modal-card { transform: translateY(0) scale(1); }
+.modal-cover { background: var(--ink); aspect-ratio: 2/3; }
+.modal-cover img, .modal-cover .book-cover-fallback { width: 100%; height: 100%; object-fit: cover; }
+.modal-body { padding: 40px 36px; display: flex; flex-direction: column; }
+.modal-close { position: absolute; top: 16px; right: 16px; background: rgba(244,238,226,0.95); border: 0; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--ink); display: flex; align-items: center; justify-content: center; }
+.modal-eyebrow { font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 16px; }
+.modal-title { font-family: var(--serif); font-weight: 400; font-size: 36px; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 8px; }
+.modal-author { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--ink-soft); margin-bottom: 24px; }
+.modal-synopsis { font-family: var(--serif); font-weight: 300; font-size: 17px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 12px; flex: 1; }
+.synopsis-source { font-family: var(--sans); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 24px; display: flex; align-items: center; gap: 6px; }
+.synopsis-source .source-mark { color: var(--accent); font-size: 12px; }
+.modal-meta { border-top: 1px solid var(--rule); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 12px; }
+.modal-meta dt { color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.15em; font-weight: 500; margin-bottom: 4px; }
+.modal-meta dd { color: var(--ink); font-family: var(--serif); font-size: 14px; }
+.modal-link { margin-top: 16px; font-family: var(--sans); font-size: 12px; color: var(--accent); text-decoration: none; letter-spacing: 0.05em; }
+.modal-link:hover { text-decoration: underline; }
+
+@media (max-aspect-ratio: 1/1) {
+  :root { --tv-cover-width: 35vh; --tv-cover-height: 52.5vh; }
+  .tv-cover-wrap { left: 50%; top: 30vh; transform: translate(-50%, 0); }
+  .tv-text { left: 6vw; right: 6vw; top: auto; bottom: 12vh; transform: none; max-width: none; }
+  .tv-header-logo { height: 7vh; }
+}
+@media (max-width: 600px) {
+  .web-header { flex-direction: column; align-items: flex-start; }
+  .web-header-meta { text-align: left; }
+  .modal-card { grid-template-columns: 1fr; max-height: 95vh; }
+  .modal-cover { aspect-ratio: 16/9; }
+}
+</style>
+</head>
+<body class="is-tv">
+
+  <div class="status-screen" id="status-screen">
+    <div class="status-mark">B</div>
+    <div class="status-title" id="status-title">Cargando novidades…</div>
+    <div class="status-detail" id="status-detail">Conectando coa biblioteca</div>
+  </div>
+
+  <main class="tv-mode" aria-label="Carrusel de novidades para a televisión da entrada">
+    <header class="tv-header">
+      <img class="tv-header-logo" src="Logo_Belesar2024.png" alt="CEIP Belesar" onerror="this.style.display='none'">
+      <div class="tv-header-text">
+        <div class="tv-header-title">Novas adquisicións</div>
+        <div class="tv-header-subtitle">Biblioteca do CEIP de Belesar</div>
+      </div>
+    </header>
+    <div class="tv-stage" id="tv-stage" aria-live="polite"></div>
+    <button class="tv-nav tv-nav-prev" id="tv-prev" aria-label="Anterior">‹</button>
+    <button class="tv-nav tv-nav-next" id="tv-next" aria-label="Seguinte">›</button>
+    <div class="tv-footer">
+      <div class="tv-progress" id="tv-progress" aria-hidden="true"></div>
+    </div>
+  </main>
+
+  <main class="web-mode" aria-label="Galería de novidades editoriais">
+    <header class="web-header">
+      <img class="web-header-logo" src="Logo_Belesar2024.png" alt="CEIP Belesar" onerror="this.style.display='none'">
+      <div class="web-header-text">
+        <div class="web-header-title">Novas adquisicións</div>
+        <div class="web-header-subtitle">Biblioteca do CEIP de Belesar</div>
+      </div>
+      <div class="web-header-meta">
+        <strong id="web-count">0</strong>
+        libros novos
+      </div>
+    </header>
+    <section class="web-grid" id="web-grid"></section>
+  </main>
+
+  <div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card" id="modal-card"></div>
+    <button class="modal-close" id="modal-close" aria-label="Pechar">✕</button>
+  </div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbyp7dbytwIniQpQX7mqEZymI6I8DV1JfW0EJxAeupOmIskw5vqRg-u8lRxoH-fmY1fI/exec';
+const TV_DURATION_MS = 9000;
+const REFRESH_MINUTES = 30;
+
+let books = [];
+let tvIdx = 0;
+let tvTimer = null;
+
+const COVER_PALETTES = [
+  { bg: "linear-gradient(135deg, #b3402c 0%, #7a2818 100%)", fg: "#f4eee2" },
+  { bg: "linear-gradient(135deg, #2c5f5d 0%, #1a3534 100%)", fg: "#e8dcc4" },
+  { bg: "linear-gradient(135deg, #d4a05a 0%, #8a6332 100%)", fg: "#1a1a1a" },
+  { bg: "linear-gradient(135deg, #3a3a52 0%, #1f1f30 100%)", fg: "#e8dcc4" },
+  { bg: "linear-gradient(135deg, #6b8e4e 0%, #3d5a2a 100%)", fg: "#f4eee2" },
+  { bg: "linear-gradient(135deg, #8a4a52 0%, #5a2a30 100%)", fg: "#f4eee2" },
+];
+function paletteForBook(book) {
+  const seed = (book.isbn || book.titulo || '').split('').reduce((a,c) => a + c.charCodeAt(0), 0);
+  return COVER_PALETTES[seed % COVER_PALETTES.length];
+}
+
+function cleanTitle(titulo) {
+  if (!titulo) return '';
+  let t = String(titulo).trim();
+  const slashIdx = t.indexOf('/');
+  if (slashIdx > -1) t = t.substring(0, slashIdx).trim();
+  const semiIdx = t.indexOf(';');
+  if (semiIdx > -1) t = t.substring(0, semiIdx).trim();
+  t = t.replace(/[.,;:\s]+$/, '').trim();
+  return t;
+}
+
+function coverUrl(book) {
+  if (book.portada_url) return book.portada_url;
+  if (!book.isbn) return null;
+  const clean = String(book.isbn).replace(/[^0-9X]/gi, '');
+  if (!clean) return null;
+  return `https://covers.openlibrary.org/b/isbn/${clean}-L.jpg?default=false`;
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[c]));
+}
+
+function isAutoSource(origen) {
+  return origen === 'google_books' || origen === 'open_library' || origen === 'gemini' || origen === 'cache';
+}
+function sourceLabel(origen) {
+  switch (origen) {
+    case 'manual': return 'Sinopse da biblioteca';
+    case 'koha': return 'Sinopse do catálogo';
+    case 'rbgalicia': return 'Sinopse da Rede de Bibliotecas de Galicia';
+    case 'google_books': return 'Sinopse automática · Google Books';
+    case 'open_library': return 'Sinopse automática · Open Library';
+    case 'gemini': return 'Sinopse automática · IA';
+    case 'cache': return 'Sinopse automática';
+    default: return '';
+  }
+}
+
+function buildCoverElement(book, sizeClass) {
+  const url = coverUrl(book);
+  if (url) {
+    const img = document.createElement('img');
+    img.className = sizeClass;
+    img.src = url;
+    img.alt = `Portada de ${cleanTitle(book.titulo)}`;
+    img.loading = 'lazy';
+    img.onerror = () => {
+      if (book.portada_url && book.isbn && img.src === book.portada_url) {
+        const clean = String(book.isbn).replace(/[^0-9X]/gi, '');
+        img.src = `https://covers.openlibrary.org/b/isbn/${clean}-L.jpg?default=false`;
+        img.onerror = () => {
+          const fb = buildFallbackCover(book);
+          if (sizeClass === 'tv-cover') fb.classList.add('tv-cover-fallback');
+          img.replaceWith(fb);
+        };
+      } else {
+        const fb = buildFallbackCover(book);
+        if (sizeClass === 'tv-cover') fb.classList.add('tv-cover-fallback');
+        img.replaceWith(fb);
+      }
+    };
+    return img;
+  }
+  return buildFallbackCover(book);
+}
+function buildFallbackCover(book) {
+  const palette = paletteForBook(book);
+  const div = document.createElement('div');
+  div.className = 'book-cover-fallback';
+  div.style.background = palette.bg;
+  div.style.color = palette.fg;
+  div.innerHTML = `
+    <div class="fb-marker"></div>
+    <div class="fb-title">${escapeHtml(cleanTitle(book.titulo))}</div>
+    <div class="fb-author">${escapeHtml(book.autor)}</div>
+  `;
+  return div;
+}
+
+async function loadBooks() {
+  try {
+    const res = await fetch(API_URL, { cache: 'no-store', redirect: 'follow' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) throw new Error('Sen libros');
+    books = data;
+    hideStatus();
+    render();
+  } catch (err) {
+    console.error('Erro cargando libros:', err);
+    if (books.length === 0) {
+      showStatus('Sen conexión', 'Non se puido contactar coa biblioteca. Reintentando…');
+      setTimeout(loadBooks, 30000);
+    }
+  }
+}
+
+function showStatus(title, detail) {
+  document.getElementById('status-title').textContent = title;
+  document.getElementById('status-detail').textContent = detail;
+  document.getElementById('status-screen').classList.remove('hidden');
+}
+function hideStatus() {
+  document.getElementById('status-screen').classList.add('hidden');
+}
+
+function render() {
+  renderTvCarousel();
+  renderWebGrid();
+}
+
+function buildTvSlide(book, idx) {
+  const palette = paletteForBook(book);
+  const slide = document.createElement('div');
+  slide.className = 'tv-slide';
+  slide.dataset.idx = idx;
+
+  const blur = document.createElement('div');
+  blur.className = 'tv-blur-bg';
+  const url = coverUrl(book);
+  if (url) blur.style.backgroundImage = `url(${url})`;
+  else { blur.style.background = palette.bg; blur.style.opacity = 1; }
+  slide.appendChild(blur);
+
+  const coverWrap = document.createElement('div');
+  coverWrap.className = 'tv-cover-wrap';
+  const cover = buildCoverElement(book, 'tv-cover');
+  if (cover.tagName === 'DIV') {
+    cover.classList.add('tv-cover-fallback');
+    cover.classList.remove('book-cover-fallback');
+  }
+  coverWrap.appendChild(cover);
+  slide.appendChild(coverWrap);
+
+  const text = document.createElement('div');
+  text.className = 'tv-text';
+
+  let synopsisHtml = '';
+  if (book.sinopsis) {
+    const autoMark = isAutoSource(book.sinopsis_origen)
+      ? '<span class="auto-mark" title="Sinopse xerada automaticamente">✨</span>'
+      : '';
+    synopsisHtml = `<p class="tv-synopsis">${escapeHtml(book.sinopsis)}${autoMark}</p>`;
+  }
+
+  const cleanedTitle = cleanTitle(book.titulo);
+  text.innerHTML = `
+    <div class="tv-eyebrow">${book.destacado ? 'Recomendación destacada' : 'Nova adquisición'}</div>
+    <h2 class="tv-title">${escapeHtml(cleanedTitle)}</h2>
+    <div class="tv-author">${escapeHtml(book.autor || '')}</div>
+    ${synopsisHtml}
+  `;
+  slide.appendChild(text);
+  return slide;
+}
+
+function buildTvProgress() {
+  const bar = document.getElementById('tv-progress');
+  bar.innerHTML = '';
+  if (books.length > 30) return;
+  for (let i = 0; i < books.length; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'tv-progress-dot';
+    bar.appendChild(dot);
+  }
+}
+
+function renderTvCarousel() {
+  const stage = document.getElementById('tv-stage');
+  stage.innerHTML = '';
+  books.forEach((book, idx) => stage.appendChild(buildTvSlide(book, idx)));
+  buildTvProgress();
+  showTvSlide(0);
+  startTvTimer();
+}
+
+function showTvSlide(idx) {
+  tvIdx = idx;
+  document.querySelectorAll('.tv-slide').forEach(s => s.classList.remove('active'));
+  const slides = document.querySelectorAll('.tv-slide');
+  if (slides[idx]) slides[idx].classList.add('active');
+  document.querySelectorAll('.tv-progress-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+}
+
+function startTvTimer() {
+  if (tvTimer) clearInterval(tvTimer);
+  if (books.length <= 1) return;
+  tvTimer = setInterval(() => { showTvSlide((tvIdx + 1) % books.length); }, TV_DURATION_MS);
+}
+
+function tvPrev() {
+  if (books.length <= 1) return;
+  showTvSlide((tvIdx - 1 + books.length) % books.length);
+  startTvTimer();
+}
+function tvNext() {
+  if (books.length <= 1) return;
+  showTvSlide((tvIdx + 1) % books.length);
+  startTvTimer();
+}
+
+function renderWebGrid() {
+  const grid = document.getElementById('web-grid');
+  grid.innerHTML = '';
+  document.getElementById('web-count').textContent = books.length;
+
+  books.forEach((book, idx) => {
+    const card = document.createElement('article');
+    card.className = 'book-card';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `Ver detalle de ${cleanTitle(book.titulo)}`);
+    const coverWrap = document.createElement('div');
+    coverWrap.className = 'book-cover-wrap';
+    coverWrap.appendChild(buildCoverElement(book, 'book-cover'));
+    const meta = document.createElement('div');
+    meta.innerHTML = `
+      <div class="book-meta-rule"></div>
+      <div class="book-eyebrow">${book.destacado ? 'Destacado' : 'Nova adquisición'}</div>
+      <h3 class="book-title">${escapeHtml(cleanTitle(book.titulo))}</h3>
+      <div class="book-author">${escapeHtml(book.autor || '')}</div>
+    `;
+    card.appendChild(coverWrap);
+    card.appendChild(meta);
+    card.addEventListener('click', () => openModal(book));
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(book); }
+    });
+    grid.appendChild(card);
+  });
+}
+
+function openModal(book) {
+  const modal = document.getElementById('modal');
+  const card = document.getElementById('modal-card');
+  card.innerHTML = '';
+  const coverDiv = document.createElement('div');
+  coverDiv.className = 'modal-cover';
+  coverDiv.appendChild(buildCoverElement(book, ''));
+  const body = document.createElement('div');
+  body.className = 'modal-body';
+
+  const sourceHtml = isAutoSource(book.sinopsis_origen)
+    ? `<div class="synopsis-source"><span class="source-mark">✨</span>${escapeHtml(sourceLabel(book.sinopsis_origen))}</div>`
+    : '';
+
+  const linkHtml = book.koha_url
+    ? `<a href="${escapeHtml(book.koha_url)}" target="_blank" rel="noopener" class="modal-link">Ver no catálogo da biblioteca →</a>`
+    : '';
+
+  body.innerHTML = `
+    <div class="modal-eyebrow">${book.destacado ? '★ Recomendación destacada' : 'Nova adquisición'}</div>
+    <h2 class="modal-title" id="modal-title">${escapeHtml(cleanTitle(book.titulo))}</h2>
+    <div class="modal-author">${escapeHtml(book.autor || '')}</div>
+    <p class="modal-synopsis">${escapeHtml(book.sinopsis || 'Sen sinopse dispoñible.')}</p>
+    ${sourceHtml}
+    <dl class="modal-meta">
+      ${book.signatura ? `<div><dt>Signatura</dt><dd>${escapeHtml(book.signatura)}</dd></div>` : ''}
+      ${book.isbn ? `<div><dt>ISBN</dt><dd>${escapeHtml(book.isbn)}</dd></div>` : ''}
+      <div><dt>Localización</dt><dd>Biblioteca CEIP Belesar</dd></div>
+    </dl>
+    ${linkHtml}
+  `;
+  card.appendChild(coverDiv);
+  card.appendChild(body);
+  modal.classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get('modo') === 'web' ? 'web' : 'tv';
+  document.body.classList.toggle('is-tv', mode === 'tv');
+  document.body.classList.toggle('is-web', mode === 'web');
+
+  document.getElementById('tv-prev').addEventListener('click', tvPrev);
+  document.getElementById('tv-next').addEventListener('click', tvNext);
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal').addEventListener('click', e => {
+    if (e.target.id === 'modal') closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeModal(); return; }
+    if (document.body.classList.contains('is-tv') && !document.getElementById('modal').classList.contains('open')) {
+      if (e.key === 'ArrowLeft') { tvPrev(); }
+      else if (e.key === 'ArrowRight') { tvNext(); }
+    }
+  });
+
+  loadBooks();
+  setInterval(loadBooks, REFRESH_MINUTES * 60 * 1000);
+
+  if (mode === 'tv') {
+    setTimeout(() => location.reload(), 24 * 60 * 60 * 1000);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
