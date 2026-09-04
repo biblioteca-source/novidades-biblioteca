@@ -133,37 +133,42 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .tv-cover-fallback .fb-author { font-family: var(--serif); font-style: italic; font-size: clamp(11px, 1.5vh, 16px); opacity: 0.85; }
 
 .tv-text {
+  --escala: 1;
   position: absolute;
   left: calc(7vw + var(--tv-cover-width) + 5vw);
-  right: 7vw; top: 50%;
-  transform: translateY(-45%);
-  max-width: 50vw;
+  right: 6vw;
+  top: 15vh; bottom: 6vh;
+  transform: none;
+  display: flex; flex-direction: column; justify-content: center;
+  overflow: hidden;
 }
 .tv-eyebrow {
-  font-family: var(--sans); font-size: clamp(10px, 1.2vh, 14px);
+  font-family: var(--sans);
+  font-size: calc(clamp(12px, 1.6vh, 22px) * var(--escala));
   letter-spacing: 0.25em; text-transform: uppercase;
-  color: var(--accent-soft); margin-bottom: 3vh; font-weight: 500;
+  color: var(--accent-soft); margin-bottom: 2.2vh; font-weight: 500;
+  flex-shrink: 0;
 }
 .tv-eyebrow::before { content: ""; display: inline-block; width: 30px; height: 1px; background: var(--accent-soft); vertical-align: middle; margin-right: 12px; }
 .tv-title {
   font-family: var(--serif); font-weight: 400;
-  font-size: clamp(38px, 6.5vh, 88px); line-height: 1.05;
-  letter-spacing: -0.02em; color: #f4eee2; margin-bottom: 2.5vh;
+  font-size: calc(clamp(40px, 8.4vh, 120px) * var(--escala)); line-height: 1.04;
+  letter-spacing: -0.02em; color: #f4eee2; margin-bottom: 2vh;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
   overflow: hidden; text-overflow: ellipsis;
 }
 .tv-author {
   font-family: var(--serif); font-style: italic; font-weight: 300;
-  font-size: clamp(16px, 2.2vh, 28px); color: var(--accent-soft); margin-bottom: 4vh;
+  font-size: calc(clamp(18px, 2.8vh, 40px) * var(--escala)); color: var(--accent-soft); margin-bottom: 2.6vh;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .tv-author::before { content: "por "; font-style: normal; color: rgba(244,238,226,0.5); font-size: 0.7em; letter-spacing: 0.1em; text-transform: uppercase; vertical-align: middle; margin-right: 6px; }
 .tv-author:empty::before { content: ""; }
 .tv-synopsis {
   font-family: var(--serif); font-weight: 300;
-  font-size: clamp(20px, 2.9vh, 34px); line-height: 1.45;
-  color: rgba(244,238,226,0.85); max-width: 30em; position: relative;
-  display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden;
+  font-size: calc(clamp(22px, 3.9vh, 52px) * var(--escala)); line-height: 1.38;
+  color: rgba(244,238,226,0.85); max-width: 32em; position: relative;
+  overflow: hidden;
 }
 .tv-synopsis .auto-mark { display: inline-block; font-size: 0.65em; color: var(--accent-soft); vertical-align: super; margin-left: 4px; opacity: 0.7; }
 
@@ -313,21 +318,56 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 .modal-link { margin-top: 16px; font-family: var(--sans); font-size: 12px; color: var(--accent); text-decoration: none; letter-spacing: 0.05em; }
 .modal-link:hover { text-decoration: underline; }
 
+/* ===== SELECTOR DE MODO ===== */
+.mode-switch {
+  position: fixed; top: 14px; right: 16px; z-index: 40;
+  display: flex; gap: 6px;
+  transition: opacity 0.3s;
+}
+.mode-switch button {
+  width: 34px; height: 34px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--rule);
+  background: rgba(244,238,226,0.78);
+  color: var(--ink-soft);
+  backdrop-filter: blur(6px);
+  transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s;
+}
+.mode-switch button:hover { color: var(--accent); border-color: var(--accent); }
+.mode-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mode-switch button.is-active { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.mode-switch svg { width: 18px; height: 18px; display: block; }
+
+/* Na TV o selector estorba: só aparece ao pasar o rato, coma as frechas */
+body.is-tv .mode-switch { opacity: 0; }
+body.is-tv:hover .mode-switch { opacity: 1; }
+body.is-tv .mode-switch button {
+  background: rgba(13,12,10,0.5);
+  border-color: rgba(244,238,226,0.2);
+  color: rgba(244,238,226,0.75);
+}
+body.is-tv .mode-switch button:hover { color: var(--accent-soft); border-color: var(--accent-soft); }
+body.is-tv .mode-switch button.is-active { background: var(--accent); border-color: var(--accent); color: #f4eee2; }
+
 @media (max-aspect-ratio: 1/1) {
   :root { --tv-cover-width: 35vh; --tv-cover-height: 52.5vh; }
   .tv-cover-wrap { left: 50%; top: 30vh; transform: translate(-50%, 0); }
-  .tv-text { left: 6vw; right: 6vw; top: auto; bottom: 12vh; transform: none; max-width: none; }
+  .tv-text { left: 6vw; right: 6vw; top: auto; bottom: 12vh; transform: none; display: block; overflow: visible; --escala: 1; }
   .tv-header-logo { height: 7vh; }
 }
 @media (max-width: 600px) {
-  .web-header { flex-direction: column; align-items: flex-start; padding: 14px 5vw 12px; gap: 10px; }
-  .web-header.is-scrolled { padding: 8px 5vw 6px; gap: 8px; }
+  .web-header { flex-direction: column; align-items: flex-start; padding: 14px 76px 12px 5vw; gap: 10px; }
+  .web-header.is-scrolled { padding: 8px 76px 6px 5vw; gap: 8px; }
   .web-header-logo { height: 50px; }
   .web-header.is-scrolled .web-header-logo { height: 32px; }
   .web-header-title { font-size: clamp(22px, 5.5vw, 32px); margin-bottom: 4px; }
   .web-header.is-scrolled .web-header-title { font-size: 16px; margin-bottom: 2px; }
   .web-header-subtitle { font-size: 11px; }
   .web-header-link { font-size: 11px; }
+  .mode-switch { top: 10px; right: 10px; }
+  .mode-switch button { width: 30px; height: 30px; }
+  .mode-switch svg { width: 16px; height: 16px; }
   .modal-overlay { padding: 2vh 2vw; align-items: flex-start; }
   .modal-card { grid-template-columns: 1fr; max-height: none; overflow-y: visible; }
   .modal-cover { aspect-ratio: 16/9; max-height: 220px; }
@@ -339,6 +379,19 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 </style>
 </head>
 <body>
+
+  <div class="mode-switch" id="mode-switch" role="group" aria-label="Modo de visualización">
+    <button type="button" data-modo="tv" title="Modo presentación" aria-label="Modo presentación">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>
+      </svg>
+    </button>
+    <button type="button" data-modo="web" title="Modo galería" aria-label="Modo galería">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+    </button>
+  </div>
 
   <div class="status-screen" id="status-screen">
     <div class="status-mark">B</div>
@@ -387,7 +440,8 @@ const TV_DURATION_MS = 20000;
 const REFRESH_MINUTES = 30;
 const TV_MIN_WIDTH = 1280;
 
-let books = [];
+let books = [];      // orde tal e como chega: máis recentes primeiro (úsaa a galería)
+let librosTv = [];   // orde barallada do carrusel
 let tvIdx = 0;
 let tvTimer = null;
 
@@ -682,18 +736,44 @@ function buildTvSlide(book, idx) {
 function buildTvProgress() {
   const bar = document.getElementById('tv-progress');
   bar.innerHTML = '';
-  if (books.length > 30) return;
-  for (let i = 0; i < books.length; i++) {
+  if (librosTv.length > 30) return;
+  for (let i = 0; i < librosTv.length; i++) {
     const dot = document.createElement('div');
     dot.className = 'tv-progress-dot';
     bar.appendChild(dot);
   }
 }
 
+/**
+ * Baralla unha lista sen tocar a orixinal (Fisher-Yates).
+ */
+function barallar(lista) {
+  const a = lista.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+/**
+ * Orde do carrusel da televisión: ao chou, para que non saian sempre
+ * os mesmos libros de primeiro. Os destacados seguen tendo prioridade,
+ * pero tamén se barallan entre eles.
+ *
+ * A galería NON se baralla: alí a orde cronolóxica é útil, porque o
+ * que se quere ver son as novidades.
+ */
+function ordenarParaTv(lista) {
+  return barallar(lista.filter(b => b.destacado))
+    .concat(barallar(lista.filter(b => !b.destacado)));
+}
+
 function renderTvCarousel() {
   const stage = document.getElementById('tv-stage');
   stage.innerHTML = '';
-  books.forEach((book, idx) => stage.appendChild(buildTvSlide(book, idx)));
+  librosTv = ordenarParaTv(books);
+  librosTv.forEach((book, idx) => stage.appendChild(buildTvSlide(book, idx)));
   buildTvProgress();
   showTvSlide(0);
   startTvTimer();
@@ -707,21 +787,77 @@ function showTvSlide(idx) {
   document.querySelectorAll('.tv-progress-dot').forEach((d, i) => {
     d.classList.toggle('active', i === idx);
   });
+  requestAnimationFrame(axustarTextoTV);
+}
+
+/**
+ * Fai que o texto do libro que se está a amosar ocupe todo o alto
+ * dispoñible sen desbordar. As televisións vense de lonxe, así que
+ * interesa a letra o máis grande posible; pero unha sinopse longa
+ * non pode saírse da pantalla nin quedar cortada.
+ *
+ * Traballa multiplicando os tamaños do CSS pola variable --escala.
+ * Se esta función fallase, os tamaños do CSS xa son correctos por si
+ * sós: isto só afina.
+ */
+function axustarTextoTV() {
+  if (!document.body.classList.contains('is-tv')) return;
+  if (window.innerWidth < window.innerHeight) return;  // en vertical manda o CSS
+
+  const slide = document.querySelector('.tv-slide.active');
+  if (!slide) return;
+  const caixa = slide.querySelector('.tv-text');
+  if (!caixa) return;
+
+  const dispoñible = caixa.clientHeight;
+  if (!dispoñible) return;
+
+  function altoDoContido() {
+    let total = 0;
+    for (const fillo of caixa.children) {
+      total += fillo.getBoundingClientRect().height +
+               (parseFloat(getComputedStyle(fillo).marginBottom) || 0);
+    }
+    return total;
+  }
+
+  let escala = 1;
+  caixa.style.setProperty('--escala', escala);
+
+  // Non cabe: reducir ata que caiba.
+  let voltas = 0;
+  while (altoDoContido() > dispoñible && escala > 0.55 && voltas++ < 40) {
+    escala = Math.round((escala - 0.03) * 1000) / 1000;
+    caixa.style.setProperty('--escala', escala);
+  }
+
+  // Sobra sitio: medrar ata aproveitalo.
+  voltas = 0;
+  while (altoDoContido() < dispoñible * 0.94 && escala < 1.7 && voltas++ < 40) {
+    escala = Math.round((escala + 0.03) * 1000) / 1000;
+    caixa.style.setProperty('--escala', escala);
+    if (altoDoContido() > dispoñible) {
+      escala = Math.round((escala - 0.03) * 1000) / 1000;
+      caixa.style.setProperty('--escala', escala);
+      break;
+    }
+  }
 }
 
 function startTvTimer() {
-  if (tvTimer) clearInterval(tvTimer);
-  if (books.length <= 1) return;
-  tvTimer = setInterval(() => { showTvSlide((tvIdx + 1) % books.length); }, TV_DURATION_MS);
+  if (tvTimer) { clearInterval(tvTimer); tvTimer = null; }
+  if (!document.body.classList.contains('is-tv')) return;
+  if (librosTv.length <= 1) return;
+  tvTimer = setInterval(() => { showTvSlide((tvIdx + 1) % librosTv.length); }, TV_DURATION_MS);
 }
 function tvPrev() {
-  if (books.length <= 1) return;
-  showTvSlide((tvIdx - 1 + books.length) % books.length);
+  if (librosTv.length <= 1) return;
+  showTvSlide((tvIdx - 1 + librosTv.length) % librosTv.length);
   startTvTimer();
 }
 function tvNext() {
-  if (books.length <= 1) return;
-  showTvSlide((tvIdx + 1) % books.length);
+  if (librosTv.length <= 1) return;
+  showTvSlide((tvIdx + 1) % librosTv.length);
   startTvTimer();
 }
 
@@ -796,6 +932,45 @@ function closeModal() {
   document.getElementById('modal').classList.remove('open');
 }
 
+let stickyListo = false;
+
+/**
+ * Aplica un modo de visualización sen recargar a páxina.
+ * Os dous modos xa están construídos no DOM: só hai que trocar as
+ * clases do body e coidar o que non é CSS (o temporizador do
+ * carrusel e as medidas da cabeceira fixa).
+ */
+function aplicarModo(modo, gardarNaUrl) {
+  if (modo !== 'tv' && modo !== 'web') return;
+
+  document.body.classList.toggle('is-tv', modo === 'tv');
+  document.body.classList.toggle('is-web', modo === 'web');
+
+  document.querySelectorAll('#mode-switch button').forEach(b => {
+    const activo = b.dataset.modo === modo;
+    b.classList.toggle('is-active', activo);
+    b.setAttribute('aria-pressed', activo ? 'true' : 'false');
+  });
+
+  if (modo === 'tv') {
+    closeModal();
+    if (librosTv.length) {
+      showTvSlide(tvIdx < librosTv.length ? tvIdx : 0);
+      startTvTimer();
+    }
+  } else {
+    if (tvTimer) { clearInterval(tvTimer); tvTimer = null; }
+    if (!stickyListo) { setupStickyHeader(); stickyListo = true; }
+    requestAnimationFrame(updateHeaderHeight);
+  }
+
+  if (gardarNaUrl) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('modo', modo);
+    history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+  }
+}
+
 function detectMode() {
   const params = new URLSearchParams(window.location.search);
   const forced = params.get('modo');
@@ -843,8 +1018,11 @@ function setupStickyHeader() {
 
 function init() {
   const mode = detectMode();
-  document.body.classList.toggle('is-tv', mode === 'tv');
-  document.body.classList.toggle('is-web', mode === 'web');
+  aplicarModo(mode, false);
+
+  document.querySelectorAll('#mode-switch button').forEach(b => {
+    b.addEventListener('click', () => aplicarModo(b.dataset.modo, true));
+  });
 
   document.getElementById('tv-prev').addEventListener('click', tvPrev);
   document.getElementById('tv-next').addEventListener('click', tvNext);
@@ -860,7 +1038,14 @@ function init() {
     }
   });
 
-  if (mode === 'web') setupStickyHeader();
+  let redimensionar = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(redimensionar);
+    redimensionar = setTimeout(axustarTextoTV, 200);
+  }, { passive: true });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(axustarTextoTV).catch(() => {});
+  }
 
   loadBooks();
   setInterval(loadBooks, REFRESH_MINUTES * 60 * 1000);
