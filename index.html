@@ -164,6 +164,15 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
 }
 .tv-author::before { content: "por "; font-style: normal; color: rgba(244,238,226,0.5); font-size: 0.7em; letter-spacing: 0.1em; text-transform: uppercase; vertical-align: middle; margin-right: 6px; }
 .tv-author:empty::before { content: ""; }
+.tv-signatura {
+  align-self: flex-start;
+  font-family: var(--sans); font-weight: 600;
+  font-size: calc(clamp(12px, 1.65vh, 22px) * var(--escala));
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(244,238,226,0.78);
+  border: 1px solid rgba(244,238,226,0.22); border-radius: 999px;
+  padding: 0.55em 0.9em; margin: -1.2vh 0 2.2vh;
+}
 .tv-synopsis {
   font-family: var(--serif); font-weight: 300;
   font-size: calc(clamp(22px, 3.9vh, 52px) * var(--escala)); line-height: 1.38;
@@ -247,6 +256,18 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   transition: color 0.2s, border-color 0.2s;
 }
 .web-header-link:hover { color: var(--accent); border-color: var(--accent); }
+.web-header-admin { color: var(--accent); font-weight: 600; }
+.web-tools {
+  display: grid; grid-template-columns: minmax(180px, 1fr) minmax(150px, 230px) auto;
+  gap: 10px; align-items: center; margin-top: 14px;
+}
+.web-tools input, .web-tools select {
+  width: 100%; border: 1px solid var(--rule); border-radius: 8px;
+  background: rgba(255,255,255,0.62); color: var(--ink);
+  font: 400 14px var(--sans); padding: 9px 11px;
+}
+.web-results-count { color: var(--ink-mute); font-size: 12px; white-space: nowrap; }
+.web-more[hidden], .web-header-admin[hidden] { display: none; }
 
 /* Padding-top dinámico calculado en JS para deixar espazo á cabeceira fixa */
 .web-grid {
@@ -256,6 +277,13 @@ body.is-tv .status-detail { color: rgba(244,238,226,0.6); }
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 56px 32px;
 }
+.web-more-wrap { display: flex; justify-content: center; padding: 0 6vw 84px; }
+.web-more {
+  border: 1px solid var(--accent); border-radius: 999px; background: transparent;
+  color: var(--accent); padding: 12px 22px; font: 600 14px var(--sans);
+}
+.web-more:hover { background: var(--accent); color: var(--paper); }
+.web-empty { grid-column: 1 / -1; text-align: center; color: var(--ink-mute); padding: 60px 20px; }
 .book-card { cursor: pointer; transition: transform 0.4s cubic-bezier(.4,0,.2,1); }
 .book-card:hover { transform: translateY(-6px); }
 .book-cover-wrap { aspect-ratio: 2/3; margin-bottom: 16px; box-shadow: 0 20px 30px -15px rgba(0,0,0,0.3), 0 6px 10px -6px rgba(0,0,0,0.15); border-radius: 2px; overflow: hidden; background: var(--ink); position: relative; transition: box-shadow 0.4s; }
@@ -365,6 +393,8 @@ body.is-tv .mode-switch button.is-active { background: var(--accent); border-col
   .web-header.is-scrolled .web-header-title { font-size: 16px; margin-bottom: 2px; }
   .web-header-subtitle { font-size: 11px; }
   .web-header-link { font-size: 11px; }
+  .web-tools { grid-template-columns: 1fr 1fr; }
+  .web-tools input { grid-column: 1 / -1; }
   .mode-switch { top: 10px; right: 10px; }
   .mode-switch button { width: 30px; height: 30px; }
   .mode-switch svg { width: 16px; height: 16px; }
@@ -423,10 +453,19 @@ body.is-tv .mode-switch button.is-active { background: var(--accent); border-col
         <div class="web-header-subtitle-row">
           <span class="web-header-subtitle">Biblioteca do CEIP de Belesar</span>
           <a class="web-header-link" href="https://ceipbelesar.edubib.xunta.gal/" target="_blank" rel="noopener">Ver catálogo completo →</a>
+          <a class="web-header-link web-header-admin" id="admin-link" href="#" hidden>Administrar →</a>
+        </div>
+        <div class="web-tools" aria-label="Ferramentas da galería">
+          <input id="web-search" type="search" autocomplete="off" placeholder="Buscar por título, autor, ISBN ou signatura" aria-label="Buscar novidades">
+          <select id="web-category" aria-label="Filtrar por categoría">
+            <option value="">Todas as categorías</option>
+          </select>
+          <span class="web-results-count" id="web-results-count" aria-live="polite"></span>
         </div>
       </div>
     </header>
     <section class="web-grid" id="web-grid"></section>
+    <div class="web-more-wrap"><button class="web-more" id="web-more" type="button" hidden>Ver máis libros</button></div>
   </main>
 
   <div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -436,14 +475,19 @@ body.is-tv .mode-switch button.is-active { background: var(--accent); border-col
 
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbyp7dbytwIniQpQX7mqEZymI6I8DV1JfW0EJxAeupOmIskw5vqRg-u8lRxoH-fmY1fI/exec';
+const ADMIN_URL = 'https://script.google.com/a/macros/ceipbelesar.org/s/AKfycbxMpltxwTuTpRwCF2MJQchEHQXjUtMELMuEwHBeRLlQRB7LFzyl-AfuI4CJ5pyStYMw/exec?admin=1';
 const TV_DURATION_MS = 20000;
 const REFRESH_MINUTES = 30;
 const TV_MIN_WIDTH = 1280;
+const WEB_PAGE_SIZE = 48;
 
 let books = [];      // orde tal e como chega: máis recentes primeiro (úsaa a galería)
 let librosTv = [];   // orde barallada do carrusel
 let tvIdx = 0;
 let tvTimer = null;
+let webQuery = '';
+let webCategory = '';
+let webVisibleCount = WEB_PAGE_SIZE;
 
 const COVER_PALETTES = [
   { bg: "linear-gradient(135deg, #b3402c 0%, #7a2818 100%)", fg: "#f4eee2" },
@@ -683,6 +727,7 @@ function hideStatus() {
 
 function render() {
   renderTvCarousel();
+  setupWebTools();
   renderWebGrid();
   // Recalcular o tamaño da cabeceira fixa cando o contido cambia
   if (document.body.classList.contains('is-web')) updateHeaderHeight();
@@ -727,6 +772,7 @@ function buildTvSlide(book, idx) {
     <div class="tv-eyebrow">${escapeHtml(buildEyebrowText(book, false))}</div>
     <h2 class="tv-title">${escapeHtml(cleanedTitle)}</h2>
     <div class="tv-author">${escapeHtml(book.autor || '')}</div>
+    ${book.signatura ? `<div class="tv-signatura">${escapeHtml(book.signatura)}</div>` : ''}
     ${synopsisHtml}
   `;
   slide.appendChild(text);
@@ -865,7 +911,27 @@ function renderWebGrid() {
   const grid = document.getElementById('web-grid');
   grid.innerHTML = '';
 
-  books.forEach((book, idx) => {
+  const filtered = books.filter(book => {
+    const category = categoryFromSignatura(book.signatura) || String(book.tipo || '').toUpperCase();
+    if (webCategory && category !== webCategory) return false;
+    if (!webQuery) return true;
+    const haystack = normalizeForSearch([
+      cleanTitle(book.titulo), book.autor, book.isbn, book.signatura, category
+    ].join(' '));
+    return haystack.includes(webQuery);
+  });
+  const visible = filtered.slice(0, webVisibleCount);
+  const count = document.getElementById('web-results-count');
+  count.textContent = filtered.length === 1 ? '1 libro' : `${filtered.length} libros`;
+  const more = document.getElementById('web-more');
+  more.hidden = visible.length >= filtered.length;
+
+  if (!visible.length) {
+    grid.innerHTML = '<p class="web-empty">Non hai libros que coincidan coa busca.</p>';
+    return;
+  }
+
+  visible.forEach((book) => {
     const card = document.createElement('article');
     card.className = 'book-card';
     card.tabIndex = 0;
@@ -891,6 +957,27 @@ function renderWebGrid() {
   });
 }
 
+function normalizeForSearch(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
+function setupWebTools() {
+  const categorySelect = document.getElementById('web-category');
+  const current = categorySelect.value;
+  const categories = Array.from(new Set(books.map(book =>
+    categoryFromSignatura(book.signatura) || String(book.tipo || '').toUpperCase()
+  ).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'gl'));
+  categorySelect.innerHTML = '<option value="">Todas as categorías</option>' +
+    categories.map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join('');
+  if (categories.includes(current)) categorySelect.value = current;
+
+  const adminLink = document.getElementById('admin-link');
+  if (/^https:\/\//.test(ADMIN_URL)) {
+    adminLink.href = ADMIN_URL;
+    adminLink.hidden = false;
+  }
+}
+
 function openModal(book) {
   const modal = document.getElementById('modal');
   const card = document.getElementById('modal-card');
@@ -906,7 +993,7 @@ function openModal(book) {
     : '';
 
   const linkHtml = book.koha_url
-    ? `<a href="${escapeHtml(book.koha_url)}" target="_blank" rel="noopener" class="modal-link">Ver no catálogo da biblioteca →</a>`
+    ? `<a href="${escapeHtml(book.koha_url)}" target="_blank" rel="noopener" class="modal-link">${book.koha_exacto ? 'Ver este libro no catálogo' : 'Buscar no catálogo'} →</a>`
     : '';
 
   body.innerHTML = `
@@ -1029,6 +1116,20 @@ function init() {
   document.getElementById('modal-close').addEventListener('click', closeModal);
   document.getElementById('modal').addEventListener('click', e => {
     if (e.target.id === 'modal') closeModal();
+  });
+  document.getElementById('web-search').addEventListener('input', e => {
+    webQuery = normalizeForSearch(e.target.value);
+    webVisibleCount = WEB_PAGE_SIZE;
+    renderWebGrid();
+  });
+  document.getElementById('web-category').addEventListener('change', e => {
+    webCategory = e.target.value;
+    webVisibleCount = WEB_PAGE_SIZE;
+    renderWebGrid();
+  });
+  document.getElementById('web-more').addEventListener('click', () => {
+    webVisibleCount += WEB_PAGE_SIZE;
+    renderWebGrid();
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeModal(); return; }
