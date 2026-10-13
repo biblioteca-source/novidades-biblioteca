@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="gl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Escáner ISBN · Novidades Biblioteca</title>
+  <style>
+    :root{color-scheme:dark;--accent:#c44532;--paper:#f7f0e4;--ink:#191714}
+    *{box-sizing:border-box}body{margin:0;background:#111;color:#fff;font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+    header{padding:18px 20px 12px}h1{font-size:clamp(25px,6vw,38px);margin:0 0 5px}p{margin:0;color:#d6d0c7}
+    main{max-width:720px;margin:auto;padding:0 16px 24px}.panel{overflow:hidden;border:1px solid #46413c;border-radius:18px;background:#1d1b19}
+    #reader{width:100%;min-height:260px;background:#000}#reader video{object-fit:cover}
+    .status{padding:14px 16px;display:grid;gap:8px}.count{font-size:20px;font-weight:750}.last{color:#ddd;overflow-wrap:anywhere}
+    .codes{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}.code{background:#34302c;border-radius:999px;padding:5px 9px;font:600 13px ui-monospace,monospace}
+    .error{display:none;background:#4a1e19;color:#fff0ed;border-radius:10px;padding:10px 12px}.error.show{display:block}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;padding:0 16px 16px}.btn{appearance:none;border:1px solid #aaa096;border-radius:10px;padding:12px 16px;background:#fff;color:var(--ink);font-weight:750;font-size:16px;cursor:pointer}.btn.primary{border-color:var(--accent);background:var(--accent);color:#fff}.btn:disabled{opacity:.5}
+    .manual{display:flex;gap:8px;padding:0 16px 16px}.manual input{min-width:0;flex:1;border:1px solid #6a635c;border-radius:10px;background:#292623;color:#fff;padding:11px;font-size:16px}
+    @media(max-width:520px){header{padding-top:max(18px,env(safe-area-inset-top))}.actions .btn{flex:1}.manual{flex-wrap:wrap}.manual input{flex-basis:100%}}
+  </style>
+</head>
+<body>
+  <header><h1>Escanear ISBN</h1><p>Enfoca un código, agarda o aviso e continúa co seguinte libro.</p></header>
+  <main>
+    <div class="panel">
+      <div id="reader"></div>
+      <div class="status" aria-live="polite">
+        <div class="count" id="count">0 ISBN escaneados</div>
+        <div class="last" id="last">Preparando a cámara…</div>
+        <div class="codes" id="codes"></div>
+        <div class="error" id="error"></div>
+      </div>
+      <div class="manual"><input id="manual" inputmode="numeric" autocomplete="off" placeholder="Ou escribe un ISBN"><button class="btn" id="add">Engadir</button></div>
+      <div class="actions"><button class="btn" id="retry">Reintentar cámara</button><button class="btn primary" id="finish" disabled>Rematar e buscar</button></div>
+    </div>
+  </main>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script>
+    const isbns=[];let scanner=null;let lockedUntil=0;
+    const $=id=>document.getElementById(id);
+    const render=(message)=>{$('count').textContent=`${isbns.length} ISBN ${isbns.length===1?'escaneado':'escaneados'}`;$('last').textContent=message;$('codes').innerHTML=isbns.map(v=>`<span class="code">${v}</span>`).join('');$('finish').disabled=!isbns.length};
+    const send=data=>{if(window.opener)window.opener.postMessage(data,'*')};
+    function add(raw){const isbn=String(raw||'').replace(/\D/g,'');if(!/^97[89]\d{10}$/.test(isbn)){render('Ese código non é un ISBN-13 válido. Proba de novo.');return false}if(isbns.includes(isbn)){render(`O ISBN ${isbn} xa estaba na lista.`);return false}isbns.push(isbn);render(`Engadido ${isbn}. Xa podes enfocar o seguinte libro.`);send({type:'novidades-isbn-scan',isbn});if(navigator.vibrate)navigator.vibrate(100);return true}
+    async function stop(){if(scanner){const current=scanner;scanner=null;try{if(current.isScanning)await current.stop();current.clear()}catch{}}}
+    async function start(){await stop();$('error').classList.remove('show');$('last').textContent='Solicitando permiso para usar a cámara…';try{if(!window.Html5Qrcode)throw new Error('Non se puido cargar o lector de códigos.');scanner=new Html5Qrcode('reader',{formatsToSupport:[Html5QrcodeSupportedFormats.EAN_13]});await scanner.start({facingMode:'environment'},{fps:12,qrbox:{width:Math.min(300,innerWidth-70),height:145}},value=>{if(Date.now()<lockedUntil)return;lockedUntil=Date.now()+1200;add(value)},()=>{});render(isbns.length?'Continúa co seguinte libro ou remata para buscar.':'Enfoca o código de barras do primeiro libro.')}catch(error){scanner=null;const text=String(error&&error.message||error||'Non se puido abrir a cámara.');$('error').textContent=`Non se puido abrir a cámara: ${text}`;$('error').classList.add('show');$('last').textContent='Podes reintentar ou escribir o ISBN manualmente.'}}
+    $('retry').addEventListener('click',start);$('add').addEventListener('click',()=>{if(add($('manual').value))$('manual').value=''});$('manual').addEventListener('keydown',e=>{if(e.key==='Enter')$('add').click()});
+    $('finish').addEventListener('click',async()=>{await stop();send({type:'novidades-isbn-finish',isbns});window.close()});window.addEventListener('beforeunload',stop);start();
+  </script>
+</body>
+</html>
